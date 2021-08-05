@@ -57,4 +57,9 @@ public class RegistrationServiceImpl implements IRegistrationService{
         appUser.setEnabled(true);
         return userRepository.save(appUser);
     }
+
+    @Override
+    public Optional<AppUser> findUserByEmail(String email) {
+        return userRepository.findAppUserByEmail(email);
+    }
 }
