@@ -1,12 +1,11 @@
 package dz.bououza.service;
 
-import dz.bououza.controller.ConfirmationTokenRepository;
+import dz.bououza.repository.ConfirmationTokenRepository;
 import dz.bououza.domain.AppUser;
 import dz.bououza.domain.AppUserRole;
 import dz.bououza.domain.ConfirmationToken;
 import dz.bououza.dto.RegistrationRequest;
 import dz.bououza.repository.AppUserRepository;
-import dz.bououza.token.SecureTokenGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,7 @@ public class RegistrationServiceImpl implements IRegistrationService{
     private final AppUserRepository userRepository;
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final IConfirmationTokenService confirmationTokenService;
 
     @Override
     public String register(RegistrationRequest request){
@@ -33,12 +33,7 @@ public class RegistrationServiceImpl implements IRegistrationService{
         appUser.setPassword(passwordEncoder.encode(request.getPassword()));
         appUser.setRole(AppUserRole.USER);
         AppUser savedUser=userRepository.save(appUser);
-
-        //generation of new token for validation mail
-        ConfirmationToken token=new ConfirmationToken();
-        token.setToken(SecureTokenGenerator.nextToken());
-        token.setAppUser(savedUser);
-        ConfirmationToken savedToken=confirmationTokenRepository.save(token);
+        ConfirmationToken savedToken=confirmationTokenService.createNewToken(savedUser);
         return savedToken.getToken();
     }
 
@@ -61,5 +56,10 @@ public class RegistrationServiceImpl implements IRegistrationService{
         confirmationTokenRepository.save(confirmationToken);
         appUser.setEnabled(true);
         return userRepository.save(appUser);
+    }
+
+    @Override
+    public Optional<AppUser> findUserByEmail(String email) {
+        return userRepository.findAppUserByEmail(email);
     }
 }

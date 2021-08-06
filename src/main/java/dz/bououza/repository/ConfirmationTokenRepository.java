@@ -1,4 +1,4 @@
-package dz.bououza.controller;
+package dz.bououza.repository;
 
 import dz.bououza.domain.ConfirmationToken;
 import org.springframework.data.repository.CrudRepository;
