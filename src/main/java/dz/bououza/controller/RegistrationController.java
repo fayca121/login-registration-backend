@@ -5,6 +5,7 @@ import dz.bououza.dto.ApiResponse;
 import dz.bououza.dto.RegistrationRequest;
 import dz.bououza.service.IRegistrationService;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -42,4 +43,9 @@ public class RegistrationController {
             return ResponseEntity.badRequest().body(new ApiResponse(true,"Registration confirmed"));
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiResponse> IllegalStateExceptionHandler(IllegalStateException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false,e.getMessage()));
+    }
 }

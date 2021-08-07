@@ -40,8 +40,6 @@ public class RegistrationServiceImpl implements IRegistrationService{
     @Override
     @Transactional
     public AppUser confirmToken(String token) {
-        if(token==null)
-            throw new IllegalArgumentException("Token should not be empty or null");
         Optional<ConfirmationToken> optionalToken=confirmationTokenRepository.findConfirmationTokenByToken(token);
         ConfirmationToken confirmationToken=optionalToken.orElseThrow(()->
                 new IllegalStateException("token not found"));
