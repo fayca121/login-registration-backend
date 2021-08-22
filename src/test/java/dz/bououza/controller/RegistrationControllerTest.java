@@ -60,4 +60,22 @@ public class RegistrationControllerTest {
         verify(service,times(1)).register(request);
         verifyNoMoreInteractions(service);
     }
+
+    @Test
+    @WithMockUser
+    public void register_newUser_validation_shouldReturnStatus400() throws Exception {
+        RegistrationRequest request=new RegistrationRequest();
+        request.setFirstName("f_user1");
+        request.setLastName("l_user1");
+        request.setEmail("user1email.com");
+        request.setPassword("P@ssw0rd");
+
+        when(service.register(request)).thenReturn(TOKEN);
+        ResultActions resultActions=mvc.perform(post("/api/v1/registration")
+                .with(csrf())
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON));
+        resultActions.andExpect(status().isBadRequest());
+        verifyNoInteractions(service);
+    }
 }
