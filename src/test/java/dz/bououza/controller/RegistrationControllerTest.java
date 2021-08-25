@@ -1,6 +1,8 @@
 package dz.bououza.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dz.bououza.domain.AppUser;
+import dz.bououza.domain.AppUserRole;
 import dz.bououza.dto.RegistrationRequest;
 import dz.bououza.service.IRegistrationService;
 import org.junit.Test;
@@ -18,6 +20,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -77,5 +80,25 @@ public class RegistrationControllerTest {
                 .contentType(MediaType.APPLICATION_JSON));
         resultActions.andExpect(status().isBadRequest());
         verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser
+    public void confirm_registration_token() throws Exception {
+        AppUser appUser=new AppUser();
+        appUser.setFirstName("f_user1");
+        appUser.setEmail("user1@mail.com");
+        appUser.setLastName("l_user1");
+        appUser.setPassword("P@ssw0rd");
+        appUser.setRole(AppUserRole.USER);
+        appUser.setEnabled(true);
+        when(service.confirmToken(TOKEN)).thenReturn(appUser);
+
+        ResultActions resultActions=mvc.perform(get("/api/v1/registration/confirm")
+                .with(csrf())
+                .param("token",TOKEN));
+        resultActions.andExpect(status().isOk());
+        verify(service,times(1)).confirmToken(TOKEN);
+        verifyNoMoreInteractions(service);
     }
 }
