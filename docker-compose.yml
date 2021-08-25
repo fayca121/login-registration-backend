@@ -1,0 +1,35 @@
+version: "2.2"
+services:
+  login-registration-backend:
+    image: faycadz/login-registration-backend
+    build: .
+    container_name: login-registration-backend
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db-mysql:3306/mydb
+    ports:
+      - "8080:8080"
+    networks:
+      - local-network
+    depends_on:
+      db-mysql:
+        condition: service_started
+    restart: on-failure
+
+  db-mysql:
+    image: mysql:5.7
+    container_name: db-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=rocks
+      - MYSQL_DATABASE=mydb
+    ports:
+      - "3306:3306"
+    networks:
+      - local-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+
+networks:
+  local-network:
+volumes:
+  mysql_data:
